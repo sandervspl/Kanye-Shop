@@ -1,0 +1,674 @@
+// colors
+$black: #1C1C1C;
+$blue: #586BFF;
+$green: #58FFA0;
+$grey: #979797;
+$grey_808: #D2D8D8;
+$grey_808_fade: rgba(210, 216, 216, 0.5);
+$grey_dark: #ECECEC;
+$red: #FF6558;
+$orange: #FFB058;
+$white: #FFFFFF;
+$yellow: #FFF158;
+
+// font weights
+$light: 300;
+$medium: 500;
+$bold: 700;
+
+// transition timing
+$timing_slow_ease: cubic-bezier(.825, 0, .5, 1);
+$timing_bounce: cubic-bezier(0.58, -0.45, 0, 2.15);
+
+// mixins
+@mixin smoothing() {
+    -moz-osx-font-smoothing: auto;
+    -webkit-font-smoothing: antialiased;
+    font-smooth: always;
+}
+
+@mixin flexbox() {
+    display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox;      /* TWEENER - IE 10 */
+    display: -webkit-flex;     /* NEW - Chrome */
+    display: flex;             /* NEW, Spec - Opera 12.1, Firefox 20+ */
+}
+
+@mixin transition($property, $duration, $timing) {
+    will-change: $property;
+    -webkit-transition: $property $duration $timing;
+    -moz-transition: $property $duration $timing;
+    -ms-transition: $property $duration $timing;
+    -o-transition: $property $duration $timing;
+    transition: $property $duration $timing;
+}
+
+@mixin boxShadow($x, $y, $blur, $spread, $color) {
+    -webkit-box-shadow: $x $y $blur $spread $color;
+    -moz-box-shadow: $x $y $blur $spread $color;
+    box-shadow: $x $y $blur $spread $color;
+}
+
+@mixin animation($name, $duration, $timing, $delay, $count, $direction, $fill, $state) {
+    animation-name:            $name;
+    animation-duration:        $duration;
+    animation-timing-function: $timing;
+    animation-delay:           $delay;
+    animation-iteration-count: $count;
+    animation-direction:       $direction;
+    animation-fill-mode:       $fill;
+    animation-play-state:      $state;
+}
+
+@mixin noSelect() {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+    -khtml-user-select: none; /* Konqueror */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version */
+}
+
+
+// Adidas Yeezy font
+@font-face {
+    font-family: 'YEEZY TSTAR';
+    font-weight: $bold;
+    src: url('../font/yeezy_tstar-heavy-webfont.ttf');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    background: $white;
+    font-family: 'Roboto', Helvetica, sans-serif;
+    font-size: 1em;
+    font-weight: $light;
+    text-transform: uppercase;
+    color: $black;
+}
+
+ul li {
+    list-style: none;
+}
+
+h1 {
+    padding-bottom: 5px;
+    font-size: 0.875em;
+    font-weight: $medium;
+    letter-spacing: 1.88px;
+}
+
+#wrapper {
+    width: 80%;
+    height: 100%;
+    margin: auto;
+
+    .face {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        opacity: .75;
+
+        img {
+            height: 50px;
+        }
+    }
+}
+
+nav {
+    @include flexbox();
+    flex-flow: row;
+    width: 100%;
+    padding: 60px 0 5px;
+    border-bottom: 1px solid $grey;
+
+    ul {
+        @include flexbox();
+        width: 100%;
+        text-align: center;
+
+        li {
+            @include flexbox();
+            flex: 1 1 auto;
+            justify-content: center;
+            font-size: .75em;
+            letter-spacing: 2px;
+            cursor: pointer;
+
+            &.active {
+                font-weight: $bold;
+                cursor: default;
+
+                &:before {
+                    content: '> ';
+                }
+            }
+        }
+    }
+}
+
+#product-grid {
+    width: 100%;
+    height: 100%;
+    margin: 75px auto 0;
+}
+
+#product-grid-rows {
+    @include flexbox();
+    flex-flow: row;
+    -webkit-flex-flow: row;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    justify-content: center;
+    -webkit-justify-content: center;
+}
+
+#cart {
+    position: fixed;
+    z-index: 100;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+
+    #cart-count.active {
+        @include animation(pulseQuantitySize, .15s, ease-in-out, 0s, 1, normal, forwards, running);
+    }
+
+    #cart-icon {
+        content: url('../img/icons/cart.png');
+        width: 30px;
+        vertical-align: middle;
+
+        &::after {
+            content: '';
+            width: 30px;
+            height: 26.62px;
+            vertical-align: middle;
+            background: transparent url("../img/icons/cart.png") left top/100% no-repeat;
+            position: relative;
+            display: inline-block;
+            top: -2px;
+        }
+    }
+}
+
+.product-card {
+    @include flexbox();
+    margin: 0 20px 0;
+    flex-grow: 1;
+    flex-direction: column;
+    flex-basis: 100%;
+    height: 250px;
+    min-width: 100%;
+    cursor: pointer;
+
+    .header {
+        width: 100%;
+        height: 100px;
+        text-align: center;
+    }
+
+    .header {
+        img {
+            height: 150px;
+            transform: translateY(-20%);
+            @include transition(height, .3s, $timing_bounce);
+        }
+    }
+
+    .description {
+        margin-top: 30px;
+    }
+
+    &:hover > .header > img {
+        height: 175px;
+    }
+}
+
+#modals {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: $grey_808_fade;
+
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: scroll;
+        @include boxShadow(0, 4px, 4px, 0, rgba(0, 0, 0, .5));
+
+        .preview {
+            padding-top: 45px;
+            width: 100%;
+            height: 280px;
+            background: $white;
+            text-align: center;
+            float: left;
+
+            img {
+                margin-bottom: 15px;
+                height: 160px;
+            }
+
+            .name {
+                font-weight: $medium;
+                font-size: 1.125em;
+                letter-spacing: 2.33px;
+            }
+
+            .price {
+                font-weight: $light;
+                font-size: 1em;
+            }
+        }
+
+        .info {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            float: left;
+
+            .exit {
+                position: fixed;
+                top: 0;
+                left: 20px;
+                width: 100%;
+                font-weight: $bold;
+                font-size: 4.375em;
+                text-align: left;
+                transform: translateY(-15px);
+
+                span {
+                    cursor: pointer;
+                    @include transition(color, .15s, linear);
+
+                    &:hover {
+                        color: rgba(0, 0, 0, .5);
+                    }
+                }
+            }
+
+            .info-1 {
+                padding-top: 20px;
+                margin-bottom: 40px;
+                text-align: center;
+
+                table {
+                    margin: auto;
+
+                    th:not(:last-child) {
+                        padding-right: 80px;
+                    }
+
+                    .rating-stars {
+                        font-family: 'YEEZY TSTAR', Helvetica, sans-serif;
+                        font-weight: $bold;
+                        font-size: 1.5em;
+                        letter-spacing: 3px;
+                        text-align: left;
+                        transform: translateX(-23px);
+
+                        span {
+                            color: $white;
+                            cursor: pointer;
+                        }
+
+                        .black {
+                            color: $black;
+                        }
+
+                        .white {
+                            color: $white;
+                        }
+                    }
+
+                    .stock-icon {
+                        margin: auto;
+                        width: 25px;
+
+                        &.yes {
+                            content: url('../img/icons/check.png');
+
+                            &::after {
+                                content: '';
+                                width: 37px;
+                                height: 30.13px;
+                                background: transparent url('../img/icons/check.png') left top/100% no-repeat;
+                                position: relative;
+                                display: inline-block;
+                                top: -2px;
+                            }
+                        }
+
+                        &.no {
+                            content: url('../img/icons/cross.png');
+
+                            &::after {
+                                content: '';
+                                width: 37px;
+                                height: 37px;
+                                background: transparent url('../img/icons/cross.png') left top/100% no-repeat;
+                                position: relative;
+                                display: inline-block;
+                                top: -2px;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .info-2 {
+                margin-bottom: 40px;
+
+                .min, .plus, form, .quantity, .cart-btn {
+                    display: inline-block;
+                    text-align: center;
+                    @include noSelect();
+
+                    &.disabled {
+                        background: $grey_dark;
+                        cursor: default;
+                    }
+                }
+
+                form {
+                    position: relative;
+                    z-index: 1;
+                    margin: 0 -4px 0;
+                    vertical-align: top;
+                }
+
+                .min, .plus {
+                    position: relative;
+                    width: 30px;
+                    height: 30px;
+                    font-size: 1em;
+                    font-weight: $bold;
+                    line-height: 30px;
+                    background: $white;
+                    cursor: pointer;
+                    @include boxShadow(0, 1px, 1px, 0, rgba(0, 0, 0, 0.5));
+                }
+
+                .quantity {
+                    width: 65px;
+                    height: 30px;
+                    font-size: 1em;
+                    font-weight: $light;
+                    border: 0;
+                    background: $white;
+                    border-radius: 0;
+
+
+                    &.active {
+                        @include animation(pulseQuantitySize, .15s, ease-in-out, 0s, 1, normal, forwards, running);
+                    }
+                }
+
+                .cart-btn {
+                    position: relative;
+                    margin-left: 10px;
+                    width: 80px;
+                    height: 30px;
+                    font-size: 1em;
+                    line-height: 30px;
+                    vertical-align: top;
+                    background: $white;
+                    cursor: pointer;
+                    @include boxShadow(0, 1px, 1px, 0, rgba(0, 0, 0, 0.5));
+                }
+
+                .min:not(.disabled):active,
+                .plus:not(.disabled):active,
+                .cart-btn:not(.disabled):active {
+                    top: 1px;
+                    left: 1px;
+                }
+            }
+
+            .info-3 {
+                h1 {
+                    margin-bottom: 30px;
+                }
+
+                table {
+                    padding: 0 30px;
+                    width: 100%;
+                    letter-spacing: 1.85px;
+
+                    .first, .second {
+                        padding-bottom: 5px;
+                        font-size: 0.75em;
+                    }
+
+                    .first {
+                        text-align: left;
+                    }
+
+                    .second {
+                        text-align: right;
+                        font-weight: $medium;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.price:before {
+    content: '€';
+}
+
+.blue {
+    background: $blue;
+}
+.green {
+    background: $green;
+}
+.grey {
+    background: $grey_808;
+}
+.orange {
+    background: $orange;
+}
+.red {
+    background: $red;
+}
+.yellow {
+    background: $yellow;
+}
+
+
+@media (min-width: 500px) {
+    nav {
+        padding: 25px 0 5px;
+
+        ul li {
+            font-size: 1em;
+        }
+    }
+}
+
+@media (min-width: 600px) {
+    .product-card {
+        flex-basis: calc(50% - 40px);
+        min-width: calc(50% - 40px);
+    }
+}
+
+@media (min-width: 625px) {
+    h1 {
+        font-size: 1.25em;
+    }
+
+    #modals .modal {
+        .preview {
+            padding-top: 70px;
+            width: 45%;
+            height: 100%;
+            float: left;
+
+            img {
+                margin-bottom: 20px;
+                height: 270px;
+
+                &:hover {
+                    @include animation(pulseImgSize, 1s, linear, 0s, infinite, normal, forwards, running)
+                }
+            }
+
+            .name {
+                margin-bottom: 10px;
+                font-size: 1.75em;
+            }
+
+            .price {
+                font-size: 1.625em;
+            }
+        }
+
+        .info {
+            width: 55%;
+            float: left;
+
+            .info-1 {
+                padding-top: 80px;
+
+                table {
+                    .rating-stars {
+                        font-size: 1.875em;
+                    }
+
+                    .stock-icon {
+                        width: 37px;
+                    }
+                }
+            }
+
+            .info-2 {
+                .min, .plus {
+                    width: 40px;
+                    height: 40px;
+                    line-height: 40px;
+                    font-size: 1.25em;
+                }
+
+                .quantity {
+                    height: 40px;
+                    font-size: 1.25em;
+                }
+
+                .cart-btn {
+                    margin-left: 20px;
+                    width: 100px;
+                    height: 40px;
+                    font-size: 1.3125em;
+                    line-height: 40px;
+                }
+            }
+
+            .info-3 {
+                table {
+                    padding: 0 30px;
+
+                    .first, .second {
+                        padding-bottom: 10px;
+                        font-size: 1em;
+                    }
+                }
+            }
+        }
+    }
+
+    @keyframes pulseQuantitySize {
+        0%, 100% {
+            font-size: 1.25em;
+        }
+
+        50% {
+            font-size: 1.75em;
+        }
+    }
+}
+
+@media (min-width: 840px) {
+    .product-card {
+        flex-basis: calc(33.33333% - 40px);
+        min-width: calc(33.33333% - 40px);
+    }
+
+    #modals .modal {
+        top: calc(50% - 262.5px);
+        left: calc(50% - 420px);
+        width: 840px;
+        height: 525px;
+
+        .info {
+            .info-1 {
+                padding-top: 0;
+            }
+
+            .exit {
+                position: relative;
+                top: 0;
+                left: 0;
+                padding-right: 15px;
+                text-align: right;
+            }
+        }
+    }
+}
+
+@keyframes pulseImgSize {
+    0%, 100% {
+        height: 275px;
+        transform: rotateZ(0deg);
+    }
+
+    50% {
+        height: 310px;
+    }
+
+    100% {
+        height: 275px;
+        transform: rotateZ(360deg);
+    }
+}
+
+@keyframes pulseQuantitySize {
+    0%, 100% {
+        font-size: 1em;
+    }
+
+    50% {
+        font-size: 1.5em;
+    }
+}
+
+@keyframes pulseCartCountSize {
+    0%, 100% {
+        font-size: 1em;
+    }
+
+    50% {
+        font-size: 1.25em;
+    }
+}
